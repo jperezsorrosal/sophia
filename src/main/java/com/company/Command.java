@@ -1,12 +1,13 @@
 package com.company;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Command {
     private String id;
     private String command;
-    private List<Input> inputs;
-    private List<Output> outputs;
+    private List<Input> inputs = new ArrayList<Input>();
+    private List<Output> outputs = new ArrayList<Output>();
 
     public Command(String id, String command) {
         this.id = id;
@@ -40,4 +41,17 @@ public class Command {
 
     public boolean hasInputs() { return !inputs.isEmpty(); }
 
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Command [" + id + "]: \"" + command + "\"\n");
+        sb.append("Input Resources:\n");
+        inputs.forEach(i -> sb. append("Resource: " + i.getResourceName() + " Type: " + i.getType().name() + "\n"));
+        sb.append("Output Resources:\n");
+        outputs.forEach(o -> sb.append("Resource: " + o.getResourceName() + " Type: " + o.getType().name() + "\n"));
+        sb.append("\n");
+
+        return sb.toString();
+    }
 }

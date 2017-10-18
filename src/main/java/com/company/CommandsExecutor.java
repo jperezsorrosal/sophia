@@ -7,21 +7,19 @@ public class CommandsExecutor {
 
         XMLShellCommandsParser parser = new XMLShellCommandsParser();
 
-        List<Command> commands = parser.parseShellCommandsFromXML("src/main/resources/commands.xml");
+        List<Command> commands = parser.parseShellCommandsFromXML("src/main/resources/commands2.xml");
 
         System.out.println("*** Parsed Commands:\n");
-        commands.forEach(c -> {
-            System.out.println("Command [" + c.getId() + "]: " + c.getCommand());
-            System.out.println("Input Resources:");
-            c.getInputs().forEach(i -> System.out.println("Resource: " + i.getResourceName() + " Type: " + i.getType().name()));
-            System.out.println("Output Resources:");
-            c.getOutputs().forEach(o -> System.out.println("Resource: " + o.getResourceName() + " Type: " + o.getType().name()));
-            System.out.println("\n");
-        });
+        commands.forEach(c -> System.out.println(c));
 
         CommandDependencyResolver deps = new CommandDependencyResolver(commands);
 
         deps.printDependency(commands.get(2));
+
+        System.out.println("\n\n*************************\n");
+        System.out.println("Commands that can be lauched for execution in this order:\n");
+
+        deps.getNoDependentAndSoftDependentInExecutionOrder().stream().forEach(c -> System.out.println(c.getId()));
 
         ExecutionResolver er = new ExecutionResolver(deps);
         er.execute();
