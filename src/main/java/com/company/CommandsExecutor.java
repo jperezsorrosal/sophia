@@ -19,5 +19,12 @@ public class CommandsExecutor {
             System.out.println("\n");
         });
 
+        CommandDependencyResolver deps = new CommandDependencyResolver(commands);
+
+        deps.printDependency(commands.get(2));
+
+        ExecutionResolver er = new ExecutionResolver(deps);
+        er.execute();
+
     }
 }

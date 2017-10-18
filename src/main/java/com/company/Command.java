@@ -38,5 +38,6 @@ public class Command {
         this.outputs = outputs;
     }
 
+    public boolean hasInputs() { return !inputs.isEmpty(); }
 
 }
