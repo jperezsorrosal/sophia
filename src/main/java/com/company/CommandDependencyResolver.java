@@ -44,27 +44,39 @@ public class CommandDependencyResolver {
         }
     }
 
-    private void findSoftDeps(Command command, List<CommandDependency> dependencies, List<Command> currentDepList) {
+    public List<Command> getCommandsWithNoDependencies(){
+        List<Command> commandsWithNoDependencies = new ArrayList<>();
+
         dependencyRegister.entrySet().stream().forEach(es -> {
+            Command command = es.getKey();
+            List<CommandDependency> commandDeps = es.getValue();
 
-            if (dependencies.isEmpty() && !currentDepList.contains(command)) {
-                currentDepList.add(command);
-
-            } else if (!dependencies.isEmpty() && !currentDepList.contains(command)) {
-
-                dependencies.forEach(cd -> {
-                    if (cd.getType() == SOFT) {
-                        Command dep = cd.getDependency();
-                        findSoftDeps(dep, dependencyRegister.get(dep), currentDepList);
-                    }
-                });
-
-                currentDepList.add(command);
-            }
+            if (commandDeps.isEmpty()) commandsWithNoDependencies.add(command);
         });
+
+        return commandsWithNoDependencies;
     }
 
-    public List<Command> getNoDependentAndSoftDependentInExecutionOrder() {
+    private void findSoftDeps(Command command, List<CommandDependency> dependencies, List<Command> currentDepList) {
+        List<Command> foundDeps = new ArrayList<>();
+
+        if (!dependencies.isEmpty() && !currentDepList.contains(command)) {
+
+            dependencies.forEach(cd -> {
+                if (cd.getType() == SOFT) {
+
+                    Command dep = cd.getDependency();
+                    foundDeps.add(dep);
+                    findSoftDeps(dep, dependencyRegister.get(dep), currentDepList);
+                }
+            });
+
+            if (!foundDeps.isEmpty()) currentDepList.add(command);
+        }
+
+    }
+
+    public List<Command> getCommandsWithSoftDependencies() {
         List<Command> softDepends = new ArrayList<Command>();
 
         dependencyRegister.entrySet().stream().forEach(es -> {
@@ -75,5 +87,36 @@ public class CommandDependencyResolver {
         });
 
         return softDepends;
+    }
+
+    private void findHardDeps(Command command, List<CommandDependency> dependencies, List<Command> currentDepList) {
+        List<Command> foundDeps = new ArrayList<>();
+
+        if (!dependencies.isEmpty() && !currentDepList.contains(command)) {
+
+            dependencies.forEach(cd -> {
+                if (cd.getType() == HARD) {
+                    Command dep = cd.getDependency();
+                    foundDeps.add(dep);
+                    findHardDeps(dep, dependencyRegister.get(dep), currentDepList);
+                }
+            });
+
+            if (!foundDeps.isEmpty()) currentDepList.add(command);
+        }
+
+    }
+
+    public List<Command> getCommandsWithHardDependencies() {
+        List<Command> hardDepends = new ArrayList<Command>();
+
+        dependencyRegister.entrySet().stream().forEach(es -> {
+            Command command = es.getKey();
+            List<CommandDependency> commandDeps = es.getValue();
+
+            findHardDeps(command, commandDeps, hardDepends);
+        });
+
+        return hardDepends;
     }
 }

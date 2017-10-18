@@ -1,25 +1,22 @@
 <commands>
     <!-- split fastq into multiple bits -->
-    <shell id="three">
-        diff <i>/tmp/tmp2.xml</i> dependency-cmds-extract.txt <si>/tmp/tmp1.fifo</si> <si>/tmp/tmp5.fifo</si>
+    <shell id="one">
+        mkfifo /tmp/tmp1.fifo;cat dependency-cmds-extract.txt > <so>/tmp/tmp1.fifo</so>
     </shell>
-
     <shell id="two">
         cat <si>/tmp/tmp1.fifo</si> > <o>/tmp/tmp2.xml</o>
     </shell>
 
-
+    <shell id="three">
+        diff <i>/tmp/tmp2.xml</i> dependency-cmds-extract.txt <si>/tmp/tmp1.fifo</si> <si>/tmp/tmp5.fifo</si>
+    </shell>
 
     <shell id="four">
-        diff cuatro
+        diff cuatro cinco
     </shell>
 
     <shell id="five">
         diff <si>/tmp/tmp6.fifo</si> dependency-cmds-extract.txt <so>/tmp/tmp5.fifo</so>
-    </shell>
-
-    <shell id="one">
-        mkfifo /tmp/tmp1.fifo;cat dependency-cmds-extract.txt > <so>/tmp/tmp1.fifo</so>
     </shell>
 
     <shell id="six">

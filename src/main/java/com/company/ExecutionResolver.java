@@ -36,6 +36,6 @@ public class ExecutionResolver {
 
     public void execute() {
 
-        dependencyResolver.getNoDependentAndSoftDependentInExecutionOrder();
+        dependencyResolver.getCommandsWithSoftDependencies();
     }
 }
