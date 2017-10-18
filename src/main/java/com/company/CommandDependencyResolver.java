@@ -119,4 +119,8 @@ public class CommandDependencyResolver {
 
         return hardDepends;
     }
+
+    public List<CommandDependency> getDependencies(Command c) {
+        return dependencyRegister.get(c);
+    }
 }

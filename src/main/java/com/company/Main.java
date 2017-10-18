@@ -7,7 +7,7 @@ public class Main {
 
         XMLShellCommandsParser parser = new XMLShellCommandsParser();
 
-        List<Command> commands = parser.parseShellCommandsFromXML("src/main/resources/commands2.xml");
+        List<Command> commands = parser.parseShellCommandsFromXML("src/main/resources/commands.xml");
 
         System.out.println("*** Parsed Commands:\n");
         commands.forEach(c -> System.out.println(c));
@@ -29,6 +29,8 @@ public class Main {
         System.out.println("\n\n*************************\n");
         System.out.println("Commands that have hard dependencies, launch must be blocked until task wich depend have finished:\n");
         deps.getCommandsWithHardDependencies().stream().forEach(c -> System.out.println(c.getId()));
+
+        System.out.println("\n\n*************************\n");
 
         ExecutionResolver er = new ExecutionResolver(deps);
         er.execute();
