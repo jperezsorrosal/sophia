@@ -1,20 +1,8 @@
 package com.company;
 
-public class Input {
+public class Input extends FileResource {
 
-    private String resourceName;
-    private ResourceType type;
-
-    Input(String name, ResourceType type) {
-        this.resourceName = name;
-        this.type = type;
-    }
-
-    public String getResourceName() {
-        return resourceName;
-    }
-
-    public ResourceType getType() {
-        return type;
+    Input(String resourceName, ResourceType type) {
+        super(resourceName, type);
     }
 }

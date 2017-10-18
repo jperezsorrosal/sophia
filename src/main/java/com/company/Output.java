@@ -1,20 +1,8 @@
 package com.company;
 
-public class Output {
+public class Output extends FileResource {
 
-    private final String resourceName;
-    private final ResourceType type;
-
-    Output(String name, ResourceType type) {
-        this.resourceName = name;
-        this.type = type;
-    }
-
-    public String getResourceName() {
-        return resourceName;
-    }
-
-    public ResourceType getType() {
-        return type;
+    Output(String resourceName, ResourceType type) {
+        super(resourceName, type);
     }
 }
