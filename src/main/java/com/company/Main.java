@@ -2,7 +2,7 @@ package com.company;
 
 import java.util.List;
 
-public class CommandsExecutor {
+public class Main {
     public static void main(String[] args) {
 
         XMLShellCommandsParser parser = new XMLShellCommandsParser();
