@@ -10,7 +10,32 @@ public class Command {
 
     public Command(String id, String command) {
         this.id = id;
+
         this.command = command;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getCommand() {
+        return command;
+    }
+
+    public List<Input> getInputs() {
+        return inputs;
+    }
+
+    public void setInputs(List<Input> inputs) {
+        this.inputs = inputs;
+    }
+
+    public List<Output> getOutputs() {
+        return outputs;
+    }
+
+    public void setOutputs(List<Output> outputs) {
+        this.outputs = outputs;
     }
 
 
