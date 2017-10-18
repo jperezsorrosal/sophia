@@ -7,7 +7,7 @@ public class CommandsExecutor {
 
         XMLShellCommandsParser parser = new XMLShellCommandsParser();
 
-        List<Command> commands = parser.parseShellCommandsFromXML("/Users/jperezsl/IdeaProjects/sophia/src/main/resources/commands.xml");
+        List<Command> commands = parser.parseShellCommandsFromXML("src/main/resources/commands.xml");
 
         System.out.println("*** Parsed Commands:\n");
         commands.forEach(c -> {
