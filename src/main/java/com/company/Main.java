@@ -31,6 +31,12 @@ public class Main {
         deps.getCommandsWithHardDependencies().stream().forEach(c -> System.out.println(c.getId()));
 
         System.out.println("\n\n*************************\n");
+        commands.forEach(c -> {
+            System.out.println("Dependent commands of command [" + c.getId() + "]:");
+            deps.getDependentCommands(c).forEach(cd -> System.out.println(" - [" + cd.getDependency().getId() + "] " + cd.getType() ));
+        });
+
+        System.out.println("\n\n*************************\n");
 
         ExecutionResolver er = new ExecutionResolver(deps);
         er.execute();

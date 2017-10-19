@@ -10,6 +10,7 @@ import static com.company.DependencyType.SOFT;
 public class CommandDependencyResolver {
 
     private HashMap<Command, List<CommandDependency>> dependencyRegister = new HashMap<>();
+    private HashMap<Command, List<CommandDependency>> dependentCommandRegister = new HashMap<>();
 
     HashMap<String, Command> outputProducer = new HashMap<>();
 
@@ -20,6 +21,24 @@ public class CommandDependencyResolver {
         // initialize the dependency register
         shellCommands.forEach(c -> dependencyRegister.put(c, new ArrayList<>()));
         shellCommands.forEach(c -> addDependencyToRegister(c));
+
+        // initialize dependent command register
+        initializeDependentCommandRegister(shellCommands);
+    }
+
+    private void initializeDependentCommandRegister(List<Command> shellCommands) {
+        shellCommands.forEach(c -> dependentCommandRegister.put(c, new ArrayList<>()));
+        dependencyRegister.entrySet().stream().forEach(entry -> {
+            Command command = entry.getKey();
+            List<CommandDependency> dependencies = entry.getValue();
+
+            if (!dependencies.isEmpty()) {
+                dependencies.stream().forEach(cd -> {
+                    CommandDependency dependent = new CommandDependency(command, cd.getType());
+                    dependentCommandRegister.get(cd.getDependency()).add(dependent);
+                });
+            }
+        });
     }
 
     private void addDependencyToRegister(Command command) {
@@ -122,5 +141,9 @@ public class CommandDependencyResolver {
 
     public List<CommandDependency> getDependencies(Command c) {
         return dependencyRegister.get(c);
+    }
+
+    public List<CommandDependency> getDependentCommands(Command c) {
+        return dependentCommandRegister.get(c);
     }
 }
