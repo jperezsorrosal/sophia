@@ -47,9 +47,9 @@ public class Command {
         StringBuilder sb = new StringBuilder();
         sb.append("Command [" + id + "]: \"" + command + "\"\n");
         sb.append("Input Resources:\n");
-        inputs.forEach(i -> sb. append("Resource: " + i.getResourceName() + " Type: " + i.getType().name() + "\n"));
+        inputs.forEach(i -> sb. append(" - Resource: " + i.getResourceName() + " Type: " + i.getType().name() + "\n"));
         sb.append("Output Resources:\n");
-        outputs.forEach(o -> sb.append("Resource: " + o.getResourceName() + " Type: " + o.getType().name() + "\n"));
+        outputs.forEach(o -> sb.append(" - Resource: " + o.getResourceName() + " Type: " + o.getType().name() + "\n"));
         sb.append("\n");
 
         return sb.toString();
