@@ -21,23 +21,17 @@ public class ExecutionResolver {
         });
 
 
-        // create barriers and set them up in corresponding Tasks
+        // create barriers for each command with hard dependency and set them up in corresponding Tasks
 
-        taskRegister.entrySet().stream().forEach(es -> {
-            Command command = es.getKey();
-            TaskWithBarrier task = es.getValue();
+        dependencyResolver.getCommandsWithHardDependencies().stream().forEach(c -> {
+            List<CommandDependency> dependencies = dependencyResolver.getDependencies(c, HARD);
 
-            dependencyResolver.getCommandsWithHardDependencies().stream().forEach(c -> {
-                List<CommandDependency> dependencies = dependencyResolver.getDependencies(c);
+            CyclicBarrier cb = new CyclicBarrier(dependencies.size(), taskRegister.get(c));
 
-                CyclicBarrier cb = new CyclicBarrier(dependencies.size(), taskRegister.get(c));
-
-                dependencies.stream().forEach(d -> {
-                    // add barrier to the task that corresponds to the dependency command
-                    taskRegister.get(d.getDependency()).addBarrier(cb);
-                });
+            dependencies.stream().forEach(d -> {
+                // add barrier to the task that corresponds to the dependency command
+                taskRegister.get(d.getDependency()).addBarrier(cb);
             });
-
         });
     }
 
@@ -123,7 +117,7 @@ public class ExecutionResolver {
         List<Command> softDepsCommands = dependencyResolver.getCommandsWithSoftDependencies();
 
         List<Command> hardDepsCommands = dependencyResolver.getCommandsWithHardDependencies();
-        
+
         noDepsCommands.stream().forEach(c -> (new Thread(taskRegister.get(c))).start() );
         softDepsCommands.stream().forEach(c -> (new Thread(taskRegister.get(c))).start() );
 

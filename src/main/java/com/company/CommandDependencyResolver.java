@@ -148,6 +148,12 @@ public class CommandDependencyResolver {
         return dependencyRegister.get(c);
     }
 
+    public List<CommandDependency> getDependencies(Command c, DependencyType type) {
+        return dependencyRegister.get(c).stream()
+                .filter(cd -> cd.getType() == type)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
     public List<CommandDependency> getDependentCommands(Command c) {
         return dependentCommandRegister.get(c);
     }
