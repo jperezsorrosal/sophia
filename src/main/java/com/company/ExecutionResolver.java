@@ -3,8 +3,11 @@ package com.company;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
+import com.company.StringColor.*;
 
 import static com.company.DependencyType.HARD;
+import static com.company.StringColor.*;
+
 
 public class ExecutionResolver {
 
@@ -85,7 +88,7 @@ public class ExecutionResolver {
         @Override
         public void run() {
 
-            System.out.println("Task for command [" + command.getId() + "] has been launched." );
+            System.out.println(StringColor.colour("Task for command [" + command.getId() + "] has been launched.", GREEN));
 
             try {
                 Thread.sleep((new Random()).nextInt(2000));
@@ -93,13 +96,13 @@ public class ExecutionResolver {
                 e.printStackTrace();
             }
 
-            System.out.println("Task for command [" + command.getId() + "] has been finished." );
+            System.out.println(StringColor.colour("Task for command [" + command.getId() + "] has been finished.", BLUE));
 
             barrierList.stream().forEach(b -> {
                     try {
-                        System.out.println("Command [" + command.getId() + "]" + " is waiting on barrier");
+                        System.out.println(StringColor.colour("Task [" + command.getId() + "]" + " is waiting on barrier", RED));
                         b.await();
-                        System.out.println("Command [" + command.getId() + "]" + " has crossed the barrier");
+                        System.out.println(StringColor.colour("Command [" + command.getId() + "]" + " has crossed the barrier", YELLOW));
                     } catch (InterruptedException ex) {
                         System.err.println(ex.toString());
                     } catch (BrokenBarrierException ex) {
