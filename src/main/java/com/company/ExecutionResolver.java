@@ -1,6 +1,8 @@
 package com.company;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.*;
 import com.company.StringColor.*;
@@ -52,26 +54,6 @@ public class ExecutionResolver {
         }
     }
 
-    private class IndependentTask extends Task {
-
-        public IndependentTask(Command command) {
-            super(command);
-        }
-
-        @Override
-        public void run() {
-            try {
-                Process p = Runtime.getRuntime().exec(command.getCommand());
-                System.out.println("Command [" + command.getId() + "] has been launched...");
-                p.waitFor();
-                System.out.println("Command [" + command.getId() + "] has finished...");
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
     private class TaskWithBarrier extends Task {
 
@@ -90,11 +72,24 @@ public class ExecutionResolver {
 
             System.out.println(StringColor.colour("Task for command [" + command.getId() + "] has been launched.", GREEN));
 
-            try {
-                Thread.sleep((new Random()).nextInt(2000));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            String[] shellCommands = command.getCommand().split(";");
+
+            Arrays.stream(shellCommands).forEach(c -> {
+
+                try {
+                    Process p = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", "\"" + c.trim() + "\""});
+
+                    System.out.println(StringColor.colour(" - Started in Shell [" + command.getId() + "]: \"" + c.trim() + "\"", StringColor.MAGENTA));
+
+                    p.waitFor();
+
+                    System.out.println(StringColor.colour(" - Executed in Shell [" + command.getId() + "]: \"" + c.trim() + "\"", StringColor.MAGENTA));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
 
             System.out.println(StringColor.colour("Task for command [" + command.getId() + "] has been finished.", BLUE));
 
@@ -103,6 +98,7 @@ public class ExecutionResolver {
                         System.out.println(StringColor.colour("Task [" + command.getId() + "]" + " is waiting on barrier", RED));
                         b.await();
                         System.out.println(StringColor.colour("Command [" + command.getId() + "]" + " has crossed the barrier", YELLOW));
+
                     } catch (InterruptedException ex) {
                         System.err.println(ex.toString());
                     } catch (BrokenBarrierException ex) {

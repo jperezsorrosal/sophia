@@ -1,7 +1,7 @@
 <commands>
     <!-- split fastq into multiple bits -->
     <shell id="one">
-        mkfifo /tmp/tmp1.fifo;cat dependency-cmds-extract.txt > <so>/tmp/tmp1.fifo</so>
+        mkfifo /tmp/tmp1.fifo; cat dependency-cmds-extract.txt > <so>/tmp/tmp1.fifo</so>
     </shell>
     <shell id="two">
         cat <si>/tmp/tmp1.fifo</si> > <o>/tmp/tmp2.xml</o>
