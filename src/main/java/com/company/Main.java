@@ -2,6 +2,8 @@ package com.company;
 
 import java.util.List;
 
+import static com.company.DependencyType.SOFT;
+
 public class Main {
     public static void main(String[] args) {
 
@@ -35,6 +37,15 @@ public class Main {
             System.out.println("Dependent commands of command [" + c.getId() + "]:");
             deps.getDependentCommands(c).forEach(cd -> System.out.println(" - [" + cd.getDependency().getId() + "] " + cd.getType() ));
         });
+
+        System.out.println("\n\n*************************\n");
+        System.out.println("Commands that have dependents:\n");
+        deps.getCommandsThatHaveDependents().stream().forEach(c -> System.out.println(" - [" + c.getId() + "] "));
+
+
+        System.out.println("\n\n*************************\n");
+        System.out.println("Commands that have dependents of specific type, SOFT:\n");
+        deps.getCommandsThatHaveDependents(SOFT).stream().forEach(c -> System.out.println(" - [" + c.getId() + "] "));
 
         System.out.println("\n\n*************************\n");
 

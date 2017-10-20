@@ -3,18 +3,23 @@ package com.company;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import static com.company.DependencyType.HARD;
 import static com.company.DependencyType.SOFT;
 
 public class CommandDependencyResolver {
 
+    private List<Command> commands;
     private HashMap<Command, List<CommandDependency>> dependencyRegister = new HashMap<>();
     private HashMap<Command, List<CommandDependency>> dependentCommandRegister = new HashMap<>();
 
     HashMap<String, Command> outputProducer = new HashMap<>();
 
     CommandDependencyResolver(List<Command> shellCommands) {
+        this.commands = shellCommands;
+
         // register which Shell Command produces which resource
         shellCommands.forEach(c -> c.getOutputs().forEach(o -> outputProducer.put(o.getResourceName(), c)));
 
@@ -145,5 +150,24 @@ public class CommandDependencyResolver {
 
     public List<CommandDependency> getDependentCommands(Command c) {
         return dependentCommandRegister.get(c);
+    }
+
+    public List<Command> getCommandsThatHaveDependents() {
+        return dependentCommandRegister.entrySet().stream()
+                .filter(es -> ! es.getValue().isEmpty())
+                .map(es -> es.getKey())
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public List<Command> getCommandsThatHaveDependents(DependencyType type) {
+        return dependentCommandRegister.entrySet().stream()
+                .filter(es -> ! es.getValue().isEmpty())
+                .filter(es -> es.getValue().stream().anyMatch(v -> v.getType() == type))
+                .map(es -> es.getKey())
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public List<Command> getCommands() {
+        return commands;
     }
 }

@@ -1,17 +1,44 @@
 package com.company;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
+
+import static com.company.DependencyType.HARD;
 
 public class ExecutionResolver {
 
     private final CommandDependencyResolver dependencyResolver;
+    private final Map<Command, TaskWithBarrier> taskRegister = new HashMap<>();
+
 
     ExecutionResolver(CommandDependencyResolver dependencyResolver) {
         this.dependencyResolver = dependencyResolver;
+
+        // initialize task register with Tasks for each command
+        dependencyResolver.getCommands().forEach(c -> {
+            taskRegister.put(c, new TaskWithBarrier(c));
+        });
+
+
+        // create barriers and set them up in corresponding Tasks
+
+        taskRegister.entrySet().stream().forEach(es -> {
+            Command command = es.getKey();
+            TaskWithBarrier task = es.getValue();
+
+            dependencyResolver.getCommandsWithHardDependencies().stream().forEach(c -> {
+                List<CommandDependency> dependencies = dependencyResolver.getDependencies(c);
+
+                CyclicBarrier cb = new CyclicBarrier(dependencies.size(), taskRegister.get(c));
+
+                dependencies.stream().forEach(d -> {
+                    // add barrier to the task that corresponds to the dependency command
+                    taskRegister.get(d.getDependency()).addBarrier(cb);
+                });
+            });
+
+        });
     }
 
     abstract class Task implements Runnable {
@@ -29,7 +56,6 @@ public class ExecutionResolver {
     }
 
     private class IndependentTask extends Task {
-
 
         public IndependentTask(Command command) {
             super(command);
@@ -52,24 +78,41 @@ public class ExecutionResolver {
 
     private class TaskWithBarrier extends Task {
 
-        private CyclicBarrier barrier;
+        private List<CyclicBarrier> barrierList = new ArrayList<>();
 
-        public TaskWithBarrier(Command command, CyclicBarrier barrier) {
+        public TaskWithBarrier(Command command) {
             super(command);
-            this.barrier = barrier;
+        }
+
+        void addBarrier(CyclicBarrier barrier) {
+            barrierList.add(barrier);
         }
 
         @Override
         public void run() {
+
+            System.out.println("Task for command [" + command.getId() + "] has been launched." );
+
             try {
-                System.out.println(Thread.currentThread().getName() + " is waiting on barrier");
-                barrier.await();
-                System.out.println(Thread.currentThread().getName() + " has crossed the barrier");
-            } catch (InterruptedException ex) {
-                System.err.println(ex.toString());
-            } catch (BrokenBarrierException ex) {
-                System.err.println(ex.toString());
+                Thread.sleep((new Random()).nextInt(2000));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+
+            System.out.println("Task for command [" + command.getId() + "] has been finished." );
+
+            barrierList.stream().forEach(b -> {
+                    try {
+                        System.out.println("Command [" + command.getId() + "]" + " is waiting on barrier");
+                        b.await();
+                        System.out.println("Command [" + command.getId() + "]" + " has crossed the barrier");
+                    } catch (InterruptedException ex) {
+                        System.err.println(ex.toString());
+                    } catch (BrokenBarrierException ex) {
+                        System.err.println(ex.toString());
+                    }
+            });
+
         }
     }
 
@@ -80,40 +123,9 @@ public class ExecutionResolver {
         List<Command> softDepsCommands = dependencyResolver.getCommandsWithSoftDependencies();
 
         List<Command> hardDepsCommands = dependencyResolver.getCommandsWithHardDependencies();
-
-        HashMap<Command, Task> taskRegister = new HashMap<>();
-
-        noDepsCommands.stream().forEach(c -> taskRegister.put(c, new IndependentTask(c)));
-        softDepsCommands.stream().forEach(c -> taskRegister.put(c, new IndependentTask(c)));
-
-//        int executorServiceSize = noDepsCommands.size() + softDepsCommands.size();
-//
-//        if (executorServiceSize > 0) {
-//
-//            ExecutorService executor = Executors.newFixedThreadPool(executorServiceSize);
-//            List<Future<?>> futures = new ArrayList<Future<?>>();
-//
-//            noDepsCommands.stream().forEach(c -> futures.add(executor.submit(new IndependentTask(c))) );
-//            softDepsCommands.stream().forEach(c -> futures.add( executor.submit(new IndependentTask(c)) ));
-//
-//            for(Future<?> future : futures)
-//                try {
-//                    future.get();
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                } catch (ExecutionException e) {
-//                    e.printStackTrace();
-//                }
-//            executor.shutdown();
-//        }
-//
-//        hardDepsCommands.stream().forEach( c -> {
-//            List<CommandDependency> dependencies = dependencyResolver.getDependencies(c);
-//            dependencies.stream().forEach(cd -> {
-//                cd.getDependency()
-//            });
-//            final CyclicBarrier cb = new CyclicBarrier(dependencies.size(), )
-//        });
+        
+        noDepsCommands.stream().forEach(c -> (new Thread(taskRegister.get(c))).start() );
+        softDepsCommands.stream().forEach(c -> (new Thread(taskRegister.get(c))).start() );
 
     }
 }
