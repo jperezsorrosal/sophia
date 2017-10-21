@@ -77,13 +77,24 @@ public class ExecutionResolver {
             Arrays.stream(shellCommands).forEach(c -> {
 
                 try {
-                    Process p = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", "\"" + c.trim() + "\""});
+                    ProcessBuilder pb = new ProcessBuilder();
+                    pb.command(new String[]{"/bin/sh", "-c",  c.trim() });
+                    pb.inheritIO();
+
+                    Process p = pb.start();
 
                     System.out.println(StringColor.colour(" - Started in Shell [" + command.getId() + "]: \"" + c.trim() + "\"", StringColor.MAGENTA));
 
                     p.waitFor();
 
-                    System.out.println(StringColor.colour(" - Executed in Shell [" + command.getId() + "]: \"" + c.trim() + "\"", StringColor.MAGENTA));
+                    BufferedReader reader =
+                            new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+                    StringBuffer output = new StringBuffer();
+                    reader.lines().forEach(l -> output.append( l + "\n"));
+
+                    System.out.println(StringColor.colour(" - Executed in Shell [" + command.getId() + "]: \"" + c.trim() + "\"\n" + output, StringColor.MAGENTA));
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
